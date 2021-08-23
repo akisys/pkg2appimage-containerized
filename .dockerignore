@@ -1,0 +1,3 @@
+# avoid build with test outputs
+buildout/
+*.AppImage

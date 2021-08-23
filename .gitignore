@@ -1,0 +1,3 @@
+# avoid commits with test build outputs
+buildout/
+*.AppImage
