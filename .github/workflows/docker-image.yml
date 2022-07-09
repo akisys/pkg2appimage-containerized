@@ -30,11 +30,14 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
+          flavor: |
+            latest=auto
           images: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=ref,event=branch
-            type=ref,event=pr
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
+            type=raw,value=devlop,enable=${{ github.ref != format('refs/heads/{0}', 'main') }}
+            type=ref,event=tag
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
 
@@ -67,14 +70,14 @@ jobs:
         with:
           sarif_file: 'trivy-results.sarif'
 
-      # - name: Build and push
-      #   uses: docker/build-push-action@v3
-      #   with:
-      #     context: .
-      #     platforms: linux/amd64
-      #     push: ${{ github.event_name != 'pull_request' }}
-      #     tags: ${{ steps.meta.outputs.tags }}
-      #     labels: ${{ steps.meta.outputs.labels }}
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: linux/amd64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
       #   run: |
       #     set -x
