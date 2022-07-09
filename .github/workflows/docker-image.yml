@@ -1,7 +1,12 @@
 name: Docker Image CI
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 env:
   REGISTRY: ghcr.io
@@ -11,20 +16,8 @@ jobs:
   build_and_push:
     runs-on: ubuntu-latest
     steps:
-      # - name: Set image tag for main branch
-      #   if:  github.ref == 'refs/heads/main'
-      #   run: echo "IMAGE_TAG=latest" >> $GITHUB_ENV
-
-      # - name: Set image tag for non-main branches
-      #   if:  github.ref != 'refs/heads/main'
-      #   run: echo "IMAGE_TAG=develop" >> $GITHUB_ENV      
-
       - name: Check out 
         uses: actions/checkout@v3
-
-      # - name: Get tag
-      #   id: repository
-      #   run: echo "::set-output name=tag::$(git describe --tags HEAD --always)"
 
       - name: Docker meta
         id: meta
