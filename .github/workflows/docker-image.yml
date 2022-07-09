@@ -53,26 +53,19 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      #   run: |
-      #     set -x
-      #     docker build \
-      #       -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.repository.outputs.tag }} \
-      #       -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
-      #       -f ./docker/Dockerfile .
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}
+          severity: 'CRITICAL'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          exit-code: '0'
 
-      # - name: Run Trivy vulnerability scanner
-      #   uses: aquasecurity/trivy-action@master
-      #   with:
-      #     image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.repository.outputs.tag }}
-      #     severity: 'CRITICAL'
-      #     format: 'sarif'
-      #     output: 'trivy-results.sarif'
-      #     exit-code: '0'
-
-      # - name: Upload Trivy scan results to GitHub Security tab
-      #   uses: github/codeql-action/upload-sarif@v2
-      #   with:
-      #     sarif_file: 'trivy-results.sarif'
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
 
       # - name: Build and push
       #   uses: docker/build-push-action@v3
