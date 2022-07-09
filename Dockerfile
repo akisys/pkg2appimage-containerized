@@ -1,11 +1,11 @@
-FROM bitnami/minideb:buster-amd64
+FROM bitnami/minideb:latest
 
 ARG PKG2APPIMAGE_URL="https://github.com/AppImage/pkg2appimage/releases/download/continuous/pkg2appimage-1807-x86_64.AppImage"
 ARG APPIMAGETOOL_URL="https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
 
 RUN set -ex \
     && apt update && apt upgrade -y \
-    && apt install -y \
+    && apt install -y --no-install-recommends \
          wget \
          curl \
          git \
@@ -18,8 +18,7 @@ RUN set -ex \
          build-essential \
          dumb-init \
          gosu \
-         rsync \
-       --no-install-recommends
+         rsync
 
 WORKDIR /tmp
 RUN set -ex \
@@ -36,6 +35,7 @@ RUN set -ex \
     && mv squashfs-root /opt/appimagetool \
     && ln -snf /opt/appimagetool/AppRun /usr/local/bin/appimagetool
 
+# base cleanup
 RUN set -ex \
     && mkdir /build \
     && rm -rf /tmp/*.ai \
